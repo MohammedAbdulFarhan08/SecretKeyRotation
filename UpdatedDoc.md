@@ -1,4 +1,4 @@
-Perfect 👍 — here’s a **concise version** with **1–2 line summaries** for every component used in your automated password rotation project:
+
 
 ---
 
@@ -41,5 +41,3 @@ Encrypts and decrypts passwords before storage to ensure all sensitive data rema
 Captures logs and metrics from all Lambdas and Step Functions for monitoring, debugging, and audit visibility.
 
 ---
-
-Would you like me to include this as a **“Component Summary” section** at the end of the full architecture document (like a one-page overview)?
