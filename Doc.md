@@ -26,13 +26,8 @@ The automation covers:
 * Update of new passwords across all target systems (databases, apps, etc.).
 * Verification of rotated credentials (Verification Lambda).
 * Centralized orchestration and logging using Step Functions.
-* Notifications and audit via SNS and PostgreSQL.
+* Notifications and audit via SNS.
 * Secure storage and encryption of credentials using KMS and Vault.
-
-Out of scope:
-
-* Vault deployment or configuration in EKS (already set up in the organization).
-* Manual credential usage flows — those remain unchanged.
 
 ---
 
