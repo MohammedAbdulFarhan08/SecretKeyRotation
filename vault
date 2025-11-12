@@ -1,0 +1,66 @@
+oc run test-vault \
+  --image=registry.web.boeing.com/container/images/base/ubi9-minimal:9.6.1758184547-1 \
+  --restart=Never \
+  --overrides='
+{
+  "spec": {
+    "serviceAccountName": "myapp-sa",
+    "dnsPolicy": "None",
+    "dnsConfig": {
+      "nameservers": ["10.236.0.21", "192.124.84.97"]
+    },
+    "imagePullSecrets": [
+      {
+        "name": "my-regcred"
+      }
+    ],
+    "volumes": [
+      {
+        "name": "vault-config",
+        "configMap": {
+          "name": "vault-agent-config"
+        }
+      },
+      {
+        "name": "vault-secret",
+        "emptyDir": {}
+      }
+    ],
+    "containers": [
+      {
+        "name": "app",
+        "image": "registry.web.boeing.com/container/images/base/ubi9-minimal:9.6.1758184547-1",
+        "command": ["sh", "-c", "cat /vault/secrets/config.txt; sleep 3600"],
+        "volumeMounts": [
+          {
+            "name": "vault-secret",
+            "mountPath": "/vault/secrets",
+            "readOnly": true
+          }
+        ],
+        "env": [
+          { "name": "HTTPS_PROXY", "value": "http://proxy.boeing.com:8080" },
+          { "name": "HTTP_PROXY", "value": "http://proxy.boeing.com:8080" },
+          { "name": "NO_PROXY", "value": "localhost,127.0.0.1,.svc,.cluster.local,10.,api.kcs-pre-clt.k8s.boeing.com,vault.squad-exploration.aws.boeing.com" }
+        ]
+      },
+      {
+        "name": "vault-agent",
+        "image": "hashicorp/vault:1.15",
+        "args": ["agent", "-config=/vault/config/config.hcl", "-log-level=info"],
+        "env": [
+          { "name": "VAULT_ADDR", "value": "https://vault.squad-exploration.aws.boeing.com:8200" },
+          { "name": "HTTPS_PROXY", "value": "http://proxy.boeing.com:8080" },
+          { "name": "HTTP_PROXY", "value": "http://proxy.boeing.com:8080" },
+          { "name": "NO_PROXY", "value": "localhost,127.0.0.1,.svc,.cluster.local,10.,api.kcs-pre-clt.k8s.boeing.com,vault.squad-exploration.aws.boeing.com" }
+        ],
+        "volumeMounts": [
+          { "name": "vault-config", "mountPath": "/vault/config" },
+          { "name": "vault-secret", "mountPath": "/vault/secrets" }
+        ]
+      }
+    ]
+  }
+}
+' \
+  --command -- sleep 3600
